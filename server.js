@@ -7,6 +7,10 @@ const MOVIES = require("./movies-data-small.json");
 
 const app = express();
 
+app.use(morgan("dev"));
+app.use(helmet());
+app.use(cors());
+
 app.use(function validateBearerToken(req, res, next) {
   const apiToken = process.env.API_TOKEN;
   const authToken = req.get("Authorization");
@@ -19,20 +23,18 @@ app.use(function validateBearerToken(req, res, next) {
   next();
 });
 
-app.use(morgan("dev"));
-app.use(helmet());
-app.use(cors());
-
 function handleGetMovie(req, res) {
   let response = MOVIES;
 
   if (req.query.genre) {
-    response = response.filter(movie => movie.genre.includes(req.query.genre));
+    response = response.filter(movie =>
+      movie.genre.toLowerCase().includes(req.query.genre.toLowerCase())
+    );
   }
 
   if (req.query.country) {
     response = response.filter(movie =>
-      movie.country.includes(req.query.country)
+      movie.country.toLowerCase().includes(req.query.country.toLowerCase())
     );
   }
 
